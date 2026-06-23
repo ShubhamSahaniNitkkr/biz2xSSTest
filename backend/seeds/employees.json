@@ -1,0 +1,23 @@
+[
+  {
+    "id": "user-1",
+    "email": "employee1@company.com",
+    "name": "Priya Sharma",
+    "employeeId": "EMP001",
+    "role": "employee"
+  },
+  {
+    "id": "user-2",
+    "email": "employee2@company.com",
+    "name": "Rahul Verma",
+    "employeeId": "EMP002",
+    "role": "employee"
+  },
+  {
+    "id": "admin-1",
+    "email": "admin@company.com",
+    "name": "Admin User",
+    "employeeId": "ADM001",
+    "role": "admin"
+  }
+]

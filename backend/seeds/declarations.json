@@ -1,0 +1,22 @@
+{
+  "user-1": {
+    "userId": "user-1",
+    "section80C": 100000,
+    "section80D": 15000,
+    "hraDeclared": 20000,
+    "proof80CSubmitted": false,
+    "proof80DSubmitted": true,
+    "proofHraSubmitted": false,
+    "proofDeadline": "2025-07-31"
+  },
+  "user-2": {
+    "userId": "user-2",
+    "section80C": 150000,
+    "section80D": 0,
+    "hraDeclared": 16000,
+    "proof80CSubmitted": true,
+    "proof80DSubmitted": true,
+    "proofHraSubmitted": true,
+    "proofDeadline": "2025-07-31"
+  }
+}

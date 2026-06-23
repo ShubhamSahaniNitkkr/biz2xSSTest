@@ -1,0 +1,48 @@
+{
+  "user-1": [
+    {
+      "month": "2025-03",
+      "earnings": { "basic": 50000, "hra": 20000, "lta": 5000, "specialAllowance": 15000, "reimbursements": 2000, "gross": 92000 },
+      "deductions": { "pf": 6000, "professionalTax": 200, "tds": 7500, "other": 0, "total": 13700 },
+      "netPay": 78300,
+      "reimbursements": 2000
+    },
+    {
+      "month": "2025-04",
+      "earnings": { "basic": 50000, "hra": 20000, "lta": 5000, "specialAllowance": 15000, "reimbursements": 2500, "gross": 92500 },
+      "deductions": { "pf": 6000, "professionalTax": 200, "tds": 7800, "other": 0, "total": 14000 },
+      "netPay": 78500,
+      "reimbursements": 2500
+    },
+    {
+      "month": "2025-05",
+      "earnings": { "basic": 50000, "hra": 20000, "lta": 5000, "specialAllowance": 15000, "reimbursements": 3000, "gross": 93000 },
+      "deductions": { "pf": 6000, "professionalTax": 200, "tds": 8000, "other": 0, "total": 14200 },
+      "netPay": 78800,
+      "reimbursements": 3000
+    }
+  ],
+  "user-2": [
+    {
+      "month": "2025-03",
+      "earnings": { "basic": 40000, "hra": 16000, "lta": 4000, "specialAllowance": 12000, "reimbursements": 1000, "gross": 73000 },
+      "deductions": { "pf": 4800, "professionalTax": 200, "tds": 5000, "other": 0, "total": 10000 },
+      "netPay": 63000,
+      "reimbursements": 1000
+    },
+    {
+      "month": "2025-04",
+      "earnings": { "basic": 40000, "hra": 16000, "lta": 4000, "specialAllowance": 12000, "reimbursements": 1500, "gross": 73500 },
+      "deductions": { "pf": 4800, "professionalTax": 200, "tds": 5200, "other": 0, "total": 10200 },
+      "netPay": 63300,
+      "reimbursements": 1500
+    },
+    {
+      "month": "2025-05",
+      "earnings": { "basic": 40000, "hra": 16000, "lta": 4000, "specialAllowance": 12000, "reimbursements": 2000, "gross": 74000 },
+      "deductions": { "pf": 4800, "professionalTax": 200, "tds": 5400, "other": 0, "total": 10400 },
+      "netPay": 63600,
+      "reimbursements": 2000
+    }
+  ]
+}
