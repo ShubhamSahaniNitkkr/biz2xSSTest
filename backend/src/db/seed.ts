@@ -15,9 +15,15 @@ export function runSeed(): void {
     initDb();
   }
 
-  for (const emp of employees as User[]) {
+  for (const emp of employees as (User & { password?: string })[]) {
     const exists = getDb().prepare('SELECT id FROM users WHERE email = ?').get(emp.email);
-    if (!exists) insertUser(emp);
+    if (!exists) {
+      insertUser(emp);
+    } else if (emp.password) {
+      getDb()
+        .prepare('UPDATE users SET name = ?, password = ? WHERE email = ?')
+        .run(emp.name, emp.password, emp.email);
+    }
   }
 
   const payrollData = payroll as Record<string, PayrollMonth[]>;

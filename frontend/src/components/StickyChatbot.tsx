@@ -11,14 +11,27 @@ interface Message {
   refused?: boolean;
 }
 
-const SUGGESTIONS = [
+const SUGGESTION_POOL = [
   'How much HRA did I receive?',
   'Why is my net salary lower this month?',
   'What deductions were applied?',
+  'What is my year-to-date net pay?',
+  'How can I save more tax under 80C?',
+  'What proofs are still pending?',
+  'Show my gross vs net breakdown',
 ];
+
+function pickSuggestions(exclude: string, offset: number): string[] {
+  const normalized = exclude.trim().toLowerCase();
+  const pool = SUGGESTION_POOL.filter((s) => s.toLowerCase() !== normalized);
+  const start = offset % pool.length;
+  const rotated = [...pool.slice(start), ...pool.slice(0, start)];
+  return rotated.slice(0, 3);
+}
 
 export default function StickyChatbot({ expanded = false }: { expanded?: boolean }) {
   const location = useLocation();
+  const widgetRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(expanded);
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -27,6 +40,7 @@ export default function StickyChatbot({ expanded = false }: { expanded?: boolean
       text: "Hi! I'm your Financial Wellness assistant. Ask me anything about your payslip, deductions, or tax savings — I'll answer using only your data.",
     },
   ]);
+  const [suggestions, setSuggestions] = useState<string[]>(() => pickSuggestions('', 0));
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -40,7 +54,7 @@ export default function StickyChatbot({ expanded = false }: { expanded?: boolean
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, loading, open]);
+  }, [messages, loading, open, suggestions]);
 
   useEffect(() => {
     if (open) {
@@ -48,9 +62,24 @@ export default function StickyChatbot({ expanded = false }: { expanded?: boolean
     }
   }, [open]);
 
+  useEffect(() => {
+    if (!open || expanded) return;
+
+    function handleClickOutside(e: MouseEvent) {
+      if (widgetRef.current && !widgetRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [open, expanded]);
+
   async function sendMessage(text: string) {
     const trimmed = text.trim();
     if (!trimmed || loading) return;
+
+    setSuggestions([]);
 
     const userMsg: Message = { id: `u-${Date.now()}`, role: 'user', text: trimmed };
     setMessages((prev) => [...prev, userMsg]);
@@ -69,6 +98,7 @@ export default function StickyChatbot({ expanded = false }: { expanded?: boolean
           refused: result.refused,
         },
       ]);
+      setSuggestions(pickSuggestions(trimmed, messages.length + 1));
     } catch (err) {
       setMessages((prev) => [
         ...prev,
@@ -79,6 +109,7 @@ export default function StickyChatbot({ expanded = false }: { expanded?: boolean
           refused: true,
         },
       ]);
+      setSuggestions(pickSuggestions(trimmed, messages.length + 1));
     } finally {
       setLoading(false);
     }
@@ -94,7 +125,10 @@ export default function StickyChatbot({ expanded = false }: { expanded?: boolean
   if (isChatRoute && !expanded) return null;
 
   return (
-    <div className={`chatbot-widget ${open ? 'chatbot-open' : ''} ${expanded ? 'chatbot-expanded' : ''}`}>
+    <div
+      ref={widgetRef}
+      className={`chatbot-widget ${open ? 'chatbot-open' : ''} ${expanded ? 'chatbot-expanded' : ''}`}
+    >
       {open && (
         <div className="chatbot-panel">
           <div className="chatbot-header">
@@ -155,16 +189,34 @@ export default function StickyChatbot({ expanded = false }: { expanded?: boolean
                 </div>
               </div>
             )}
+
+            {!loading && suggestions.length > 0 && !expanded && (
+              <div
+                className="chatbot-suggestions"
+                style={{ padding: '0.25rem 0 0', marginLeft: '2.25rem', maxWidth: '88%' }}
+              >
+                <div className="chatbot-suggestions-chips">
+                  {suggestions.map((s) => (
+                    <button key={s} type="button" className="suggestion-chip" onClick={() => sendMessage(s)}>
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
             <div ref={messagesEndRef} />
           </div>
 
-          {messages.length <= 2 && !loading && (
+          {!loading && suggestions.length > 0 && expanded && (
             <div className="chatbot-suggestions">
-              {SUGGESTIONS.map((s) => (
-                <button key={s} type="button" className="suggestion-chip" onClick={() => sendMessage(s)}>
-                  {s}
-                </button>
-              ))}
+              <p className="chatbot-suggestions-label">Suggested questions</p>
+              <div className="chatbot-suggestions-chips">
+                {suggestions.map((s) => (
+                  <button key={s} type="button" className="suggestion-chip" onClick={() => sendMessage(s)}>
+                    {s}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
 

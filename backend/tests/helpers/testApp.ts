@@ -31,7 +31,12 @@ export function getTestApp() {
 }
 
 export function getToken(email: string): string {
-  return login(email).token;
+  const passwords: Record<string, string> = {
+    'employee1@company.com': 'demo123',
+    'employee2@company.com': 'demo456',
+    'admin@company.com': 'admin123',
+  };
+  return login(email, passwords[email] ?? 'demo123').token;
 }
 
 export const USER1_EMAIL = 'employee1@company.com';

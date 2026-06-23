@@ -41,10 +41,10 @@ export async function api<T>(
 }
 
 export const authApi = {
-  login: (email: string) =>
+  login: (email: string, password: string) =>
     api<{ token: string; user: { name: string; email: string; role: string } }>(
       '/auth/login',
-      { method: 'POST', body: JSON.stringify({ email }) },
+      { method: 'POST', body: JSON.stringify({ email, password }) },
     ),
 };
 

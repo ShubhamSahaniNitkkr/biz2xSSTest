@@ -21,12 +21,19 @@ export function findUserById(id: string): User | null {
   return row ? rowToUser(row as Record<string, unknown>) : null;
 }
 
-export function insertUser(user: User): void {
+export function insertUser(user: User & { password?: string }): void {
   getDb()
     .prepare(
-      'INSERT INTO users (id, email, name, employee_id, role) VALUES (?, ?, ?, ?, ?)',
+      'INSERT INTO users (id, email, name, employee_id, role, password) VALUES (?, ?, ?, ?, ?, ?)',
     )
-    .run(user.id, user.email, user.name, user.employeeId, user.role);
+    .run(user.id, user.email, user.name, user.employeeId, user.role, user.password ?? 'demo123');
+}
+
+export function findUserPassword(email: string): string | null {
+  const row = getDb().prepare('SELECT password FROM users WHERE email = ?').get(email) as
+    | { password: string }
+    | undefined;
+  return row?.password ?? null;
 }
 
 export function listUsers(): User[] {

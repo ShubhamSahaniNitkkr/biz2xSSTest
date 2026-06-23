@@ -11,7 +11,8 @@ CREATE TABLE IF NOT EXISTS users (
   email TEXT UNIQUE NOT NULL,
   name TEXT NOT NULL,
   employee_id TEXT NOT NULL,
-  role TEXT NOT NULL DEFAULT 'employee'
+  role TEXT NOT NULL DEFAULT 'employee',
+  password TEXT NOT NULL DEFAULT 'demo123'
 );
 
 CREATE TABLE IF NOT EXISTS payslips (
@@ -75,7 +76,15 @@ export function initDb(dbPath?: string): Database.Database {
   db.pragma('journal_mode = WAL');
   db.pragma('foreign_keys = ON');
   db.exec(SCHEMA);
+  migrateSchema(db);
   return db;
+}
+
+function migrateSchema(database: Database.Database): void {
+  const columns = database.prepare('PRAGMA table_info(users)').all() as { name: string }[];
+  if (!columns.some((c) => c.name === 'password')) {
+    database.exec(`ALTER TABLE users ADD COLUMN password TEXT NOT NULL DEFAULT 'demo123'`);
+  }
 }
 
 export function closeDb(): void {

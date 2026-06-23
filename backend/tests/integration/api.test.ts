@@ -20,9 +20,19 @@ describe('integration: auth and payroll', () => {
   });
 
   it('login returns token', async () => {
-    const res = await request(app).post('/auth/login').send({ email: USER1_EMAIL });
+    const res = await request(app)
+      .post('/auth/login')
+      .send({ email: USER1_EMAIL, password: 'demo123' });
     expect(res.status).toBe(200);
     expect(res.body.data.token).toBeDefined();
+    expect(res.body.data.user.name).toBe('Shubham Sunny');
+  });
+
+  it('login rejects wrong password', async () => {
+    const res = await request(app)
+      .post('/auth/login')
+      .send({ email: USER1_EMAIL, password: 'wrong' });
+    expect(res.status).toBe(401);
   });
 
   it('payroll months scoped to user', async () => {

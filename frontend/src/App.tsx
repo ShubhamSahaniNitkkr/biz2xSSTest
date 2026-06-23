@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { BrowserRouter, Routes, Route, NavLink, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, NavLink, Navigate, useLocation } from 'react-router-dom';
 import { getToken, clearToken } from './api/client';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
@@ -43,6 +43,8 @@ function readSidebarCollapsed(): boolean {
 }
 
 function AppLayout({ userName, onLogout }: { userName: string; onLogout: () => void }) {
+  const location = useLocation();
+  const isChatPage = location.pathname === '/chat';
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(readSidebarCollapsed);
   const initials = userName
@@ -150,7 +152,7 @@ function AppLayout({ userName, onLogout }: { userName: string; onLogout: () => v
           </button>
         </header>
 
-        <main className="page-content">
+        <main className={`page-content ${isChatPage ? 'page-content-chat' : ''}`}>
           <Routes>
             <Route path="/" element={<DashboardPage />} />
             <Route path="/payroll" element={<PayrollPage />} />
@@ -163,14 +165,14 @@ function AppLayout({ userName, onLogout }: { userName: string; onLogout: () => v
         </main>
       </div>
 
-      <StickyChatbot />
+      {!isChatPage && <StickyChatbot />}
     </div>
   );
 }
 
 export default function App() {
   const [loggedIn, setLoggedIn] = useState(!!getToken());
-  const [userName, setUserName] = useState('Employee');
+  const [userName, setUserName] = useState('Shubham Sunny');
 
   function handleLogin(name: string) {
     setUserName(name);

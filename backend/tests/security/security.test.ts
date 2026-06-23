@@ -81,7 +81,7 @@ describe('security tests SEC-01 to SEC-12', () => {
   it('SEC-06: LLM context for user A contains no user B data', () => {
     const ctx = buildGroundedContext(buildUserContext('user-1'));
     const json = JSON.stringify(ctx);
-    expect(json).not.toContain('Rahul');
+    expect(json).not.toContain('Demo User Two');
     expect(json).not.toContain('user-2');
     expect(json).not.toContain('63600');
   });

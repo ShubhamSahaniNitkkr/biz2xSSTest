@@ -51,6 +51,7 @@ export default function UploadPage() {
   function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (file) processFile(file);
+    e.target.value = '';
   }
 
   function handleDrop(e: React.DragEvent) {
@@ -76,7 +77,6 @@ export default function UploadPage() {
           onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
           onDragLeave={() => setDragOver(false)}
           onDrop={handleDrop}
-          onClick={() => inputRef.current?.click()}
         >
           <input
             ref={inputRef}

@@ -2,22 +2,25 @@
   {
     "id": "user-1",
     "email": "employee1@company.com",
-    "name": "Priya Sharma",
+    "name": "Shubham Sunny",
     "employeeId": "EMP001",
-    "role": "employee"
+    "role": "employee",
+    "password": "demo123"
   },
   {
     "id": "user-2",
     "email": "employee2@company.com",
-    "name": "Rahul Verma",
+    "name": "Demo User Two",
     "employeeId": "EMP002",
-    "role": "employee"
+    "role": "employee",
+    "password": "demo456"
   },
   {
     "id": "admin-1",
     "email": "admin@company.com",
-    "name": "Admin User",
+    "name": "Platform Admin",
     "employeeId": "ADM001",
-    "role": "admin"
+    "role": "admin",
+    "password": "admin123"
   }
 ]

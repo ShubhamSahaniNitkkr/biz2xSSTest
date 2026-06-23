@@ -8,22 +8,48 @@ interface Props {
 }
 
 const DEMO_USERS = [
-  'employee1@company.com',
-  'employee2@company.com',
-  'admin@company.com',
-];
+  {
+    email: 'employee1@company.com',
+    password: 'demo123',
+    name: 'Shubham Sunny',
+    role: 'Employee',
+    profile: 'Payroll + pending proof checklist',
+  },
+  {
+    email: 'employee2@company.com',
+    password: 'demo456',
+    name: 'Demo User Two',
+    role: 'Employee',
+    profile: 'Payroll + all proofs submitted',
+  },
+  {
+    email: 'admin@company.com',
+    password: 'admin123',
+    name: 'Platform Admin',
+    role: 'Admin',
+    profile: 'Admin access (same employee views)',
+  },
+] as const;
 
 export default function LoginPage({ onLogin }: Props) {
-  const [email, setEmail] = useState(DEMO_USERS[0]);
+  const [email, setEmail] = useState<string>(DEMO_USERS[0].email);
+  const [password, setPassword] = useState<string>(DEMO_USERS[0].password);
+  const [showDemoModal, setShowDemoModal] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  function applyDemoUser(user: (typeof DEMO_USERS)[number]) {
+    setEmail(user.email);
+    setPassword(user.password);
+    setShowDemoModal(false);
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
     setLoading(true);
     try {
-      const result = await authApi.login(email);
+      const result = await authApi.login(email, password);
       setToken(result.token);
       onLogin(result.user.name);
     } catch (err) {
@@ -54,18 +80,69 @@ export default function LoginPage({ onLogin }: Props) {
 
         <div className="card login-card">
           <h2 style={{ marginBottom: '0.5rem' }}>Welcome back</h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
-            Sign in with a demo employee account to explore the platform.
+          <p className="login-card-subtitle">
+            Sign in with your work email to explore the platform.
           </p>
 
           <form onSubmit={handleSubmit}>
             <div className="form-group">
-              <label className="form-label" htmlFor="email">Work email</label>
-              <select id="email" value={email} onChange={(e) => setEmail(e.target.value)}>
-                {DEMO_USERS.map((u) => (
-                  <option key={u} value={u}>{u}</option>
-                ))}
-              </select>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '0.5rem',
+                  marginBottom: '0.35rem',
+                }}
+              >
+                <label className="form-label" htmlFor="email" style={{ marginBottom: 0 }}>
+                  Work email
+                </label>
+                <span style={{ fontSize: '0.72rem', whiteSpace: 'nowrap' }}>
+                  <button
+                    type="button"
+                    onClick={() => setShowDemoModal(true)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      padding: 0,
+                      font: 'inherit',
+                      color: 'var(--accent)',
+                      cursor: 'pointer',
+                      textDecoration: 'underline',
+                    }}
+                  >
+                    Login with other demo account
+                  </button>
+                  <span
+                    title="Tap the link to view demo emails and passwords"
+                    aria-label="Demo account help"
+                    style={{ color: 'var(--text-muted)', marginLeft: '0.2rem', cursor: 'default' }}
+                  >
+                    ?
+                  </span>
+                </span>
+              </div>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="username"
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label" htmlFor="password">Password</label>
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
+                required
+              />
             </div>
 
             {error && <div className="alert-error">{error}</div>}
@@ -93,9 +170,116 @@ export default function LoginPage({ onLogin }: Props) {
         </div>
 
         <p className="login-demo-hint">
-          Demo accounts pre-loaded with payslip & payroll data
+          Demo accounts pre-loaded with payslip &amp; payroll data
         </p>
       </div>
+
+      {showDemoModal && (
+        <>
+          <style>{`
+            @keyframes loginDemoPop {
+              from { opacity: 0; transform: translateY(10px) scale(0.97); }
+              to { opacity: 1; transform: translateY(0) scale(1); }
+            }
+            .login-demo-modal-overlay {
+              animation: fadeIn 0.18s ease;
+            }
+            .login-demo-modal-content {
+              animation: loginDemoPop 0.22s ease;
+            }
+          `}</style>
+          <div
+            role="presentation"
+            className="login-demo-modal-overlay"
+            onClick={() => setShowDemoModal(false)}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(15, 23, 42, 0.45)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '1rem',
+              zIndex: 300,
+            }}
+          >
+            <div
+              role="dialog"
+              aria-labelledby="demo-modal-title"
+              aria-modal="true"
+              className="card login-demo-modal-content"
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                width: '100%',
+                maxWidth: '380px',
+                maxHeight: '80vh',
+                overflow: 'auto',
+                padding: '1rem 1.1rem',
+              }}
+            >
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: '0.5rem',
+              }}
+            >
+              <h3 id="demo-modal-title" style={{ margin: 0, fontSize: '1rem' }}>
+                Demo accounts
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowDemoModal(false)}
+                aria-label="Close"
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '1.25rem',
+                  lineHeight: 1,
+                  cursor: 'pointer',
+                  color: 'var(--text-muted)',
+                }}
+              >
+                ×
+              </button>
+            </div>
+            <p className="login-demo-intro" style={{ marginBottom: '0.65rem', fontSize: '0.8rem' }}>
+              Select an account to fill email and password.
+            </p>
+            <ul className="login-demo-list" style={{ gap: '0.5rem' }}>
+              {DEMO_USERS.map((user) => (
+                <li key={user.email}>
+                  <button
+                    type="button"
+                    onClick={() => applyDemoUser(user)}
+                    style={{
+                      width: '100%',
+                      textAlign: 'left',
+                      background: 'none',
+                      border: 'none',
+                      padding: 0,
+                      cursor: 'pointer',
+                      font: 'inherit',
+                      color: 'inherit',
+                    }}
+                  >
+                    <div className="login-demo-list-header">
+                      <strong style={{ fontSize: '0.88rem' }}>{user.name}</strong>
+                      <span className="login-demo-role">{user.role}</span>
+                    </div>
+                    <div className="login-demo-creds">
+                      <span><em>Email</em> {user.email}</span>
+                      <span><em>Password</em> {user.password}</span>
+                    </div>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+        </>
+      )}
     </div>
   );
 }

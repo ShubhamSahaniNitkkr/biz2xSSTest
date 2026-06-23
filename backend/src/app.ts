@@ -1,7 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import { loadEnv } from './config/env.js';
-import { initDb } from './db/database.js';
+import { initDb, getDb } from './db/database.js';
+import { runSeed } from './db/seed.js';
 import { requestId, errorHandler } from './middleware/errorHandler.js';
 import { healthRouter } from './routes/health.js';
 import { authRouter } from './routes/auth.js';
@@ -20,6 +21,7 @@ export function createApp(): express.Application {
   } catch {
     initDb();
   }
+  runSeed();
 
   const env = loadEnv();
 

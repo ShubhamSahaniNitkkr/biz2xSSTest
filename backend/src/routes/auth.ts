@@ -13,7 +13,7 @@ authRouter.post('/login', loginLimiter, (req, res, next) => {
     if (!parsed.success) {
       throw new AppError('VALIDATION_ERROR', parsed.error.errors[0]?.message ?? 'Invalid input', 400);
     }
-    const result = login(parsed.data.email);
+    const result = login(parsed.data.email, parsed.data.password);
     sendSuccess(res, result);
   } catch (err) {
     next(err);

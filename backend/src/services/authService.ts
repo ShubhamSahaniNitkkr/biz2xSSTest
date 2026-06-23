@@ -1,10 +1,15 @@
-import { findUserByEmail } from '../repositories/userRepo.js';
+import { findUserByEmail, findUserPassword } from '../repositories/userRepo.js';
 import { signToken } from '../middleware/auth.js';
 import { AppError } from '../utils/AppError.js';
 
-export function login(email: string) {
+export function login(email: string, password: string) {
   const user = findUserByEmail(email);
   if (!user) {
+    throw new AppError('UNAUTHORIZED', 'Invalid email or credentials', 401);
+  }
+
+  const storedPassword = findUserPassword(email);
+  if (!storedPassword || storedPassword !== password) {
     throw new AppError('UNAUTHORIZED', 'Invalid email or credentials', 401);
   }
 
