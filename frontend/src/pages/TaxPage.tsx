@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import { taxApi } from '../api/client';
+import PageHeader from '../components/PageHeader';
+import Loader from '../components/Loader';
+import { IconTax, IconSparkle } from '../components/Icons';
 
 export default function TaxPage() {
   const [extra80C, setExtra80C] = useState(50000);
@@ -26,51 +29,113 @@ export default function TaxPage() {
     }
   }
 
+  const sliderPct = (extra80C / 150000) * 100;
+
   return (
-    <div>
-      <h1>Tax saving simulator</h1>
-      <div className="card">
-        <p>Estimate impact of additional Section 80C investment (simplified assumptions).</p>
-        <label htmlFor="extra80c">Additional 80C (₹)</label>
-        <input
-          id="extra80c"
-          type="number"
-          min={0}
-          max={150000}
-          value={extra80C}
-          onChange={(e) => setExtra80C(Number(e.target.value))}
-        />
-        <button type="button" onClick={handleSimulate} disabled={loading}>
-          {loading ? 'Calculating...' : 'Simulate'}
+    <div className="fade-in">
+      <PageHeader
+        title="Tax Saving Simulator"
+        subtitle="Estimate the impact of additional Section 80C investments on your annual tax and monthly TDS."
+        badge="Tax Planning"
+      />
+
+      <div className="card" style={{ position: 'relative' }}>
+        {loading && <Loader overlay label="Running tax simulation..." />}
+
+        <div className="card-header">
+          <h2 className="card-title card-title-icon">
+            <IconTax size={18} />
+            Section 80C Investment
+          </h2>
+          <span className="badge">Simplified model</span>
+        </div>
+
+        <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+          Drag the slider to see how additional 80C investments (PPF, ELSS, LIC, etc.) could reduce your tax liability.
+        </p>
+
+        <div className="tax-slider-wrap">
+          <div className="tax-slider-header">
+            <label className="form-label" style={{ margin: 0 }}>Additional 80C investment</label>
+            <span className="tax-slider-value">₹{extra80C.toLocaleString('en-IN')}</span>
+          </div>
+          <input
+            type="range"
+            min={0}
+            max={150000}
+            step={5000}
+            value={extra80C}
+            onChange={(e) => setExtra80C(Number(e.target.value))}
+            style={{
+              background: `linear-gradient(90deg, var(--accent) ${sliderPct}%, var(--bg-elevated) ${sliderPct}%)`,
+            }}
+          />
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.35rem' }}>
+            <span>₹0</span>
+            <span>₹1,50,000 (max)</span>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          className="btn-primary"
+          onClick={handleSimulate}
+          disabled={loading}
+        >
+          <IconSparkle size={18} />
+          {loading ? 'Calculating...' : 'Run simulation'}
         </button>
-        {error && <div className="error">{error}</div>}
-        {result && (
-          <>
-            <div className="success" style={{ marginTop: '1rem' }}>
-              Annual tax saving: ₹{result.annualTaxSaving.toLocaleString('en-IN')} —
-              Monthly TDS saving: ₹{result.monthlyTdsSaving.toLocaleString('en-IN')}
-              {result.note && <p>{result.note}</p>}
+
+        {error && <div className="alert-error" style={{ marginTop: '1rem' }}>{error}</div>}
+
+        {result && !loading && (
+          <div className="fade-in">
+            <div className="tax-results">
+              <div className="tax-result-card annual">
+                <div className="tax-result-label">Annual Tax Saving</div>
+                <div className="tax-result-value" style={{ color: 'var(--accent-emerald)' }}>
+                  ₹{result.annualTaxSaving.toLocaleString('en-IN')}
+                </div>
+              </div>
+              <div className="tax-result-card monthly">
+                <div className="tax-result-label">Monthly TDS Saving</div>
+                <div className="tax-result-value" style={{ color: 'var(--accent-light)' }}>
+                  ₹{result.monthlyTdsSaving.toLocaleString('en-IN')}
+                </div>
+              </div>
             </div>
-            <h3>Step-by-step</h3>
-            <table>
-              <thead>
-                <tr><th>Step</th><th>Value</th><th>Note</th></tr>
-              </thead>
-              <tbody>
-                {result.steps.map((s) => (
-                  <tr key={s.label}>
-                    <td>{s.label}</td>
-                    <td>₹{s.value.toLocaleString('en-IN')}</td>
-                    <td>{s.note}</td>
+
+            {result.note && (
+              <div className="alert-warning">{result.note}</div>
+            )}
+
+            <h3 style={{ marginTop: '1.5rem' }}>Step-by-step breakdown</h3>
+            <div className="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Step</th>
+                    <th>Value</th>
+                    <th>Note</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-            <h3>Assumptions</h3>
-            <ul>
+                </thead>
+                <tbody>
+                  {result.steps.map((s) => (
+                    <tr key={s.label}>
+                      <td>{s.label}</td>
+                      <td className="td-mono">₹{s.value.toLocaleString('en-IN')}</td>
+                      <td style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{s.note}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <h3 style={{ marginTop: '1.5rem' }}>Assumptions</h3>
+            <ul className="assumptions-list">
               {result.assumptions.map((a) => <li key={a}>{a}</li>)}
             </ul>
-          </>
+          </div>
         )}
       </div>
     </div>
